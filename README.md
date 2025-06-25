@@ -54,11 +54,6 @@
 
 ---
 
-## 🖥️ Dashboard Preview
-
-![Dashboard Screenshot](static/dashboard-screenshot.png)
-
----
 
 ## ⚙️ Configuration
 
@@ -126,8 +121,6 @@ multithreaded-webserver/
 
 ---
 
-## 🧑‍💻 Author
 
-Made with ❤️ in Go by [Your Name](https://github.com/yourusername)
 
 </rewritten_file>
