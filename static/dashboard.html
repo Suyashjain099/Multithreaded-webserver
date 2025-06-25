@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Go Web Server Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 0; }
+        .container { max-width: 700px; margin: 2em auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 2em; }
+        h1 { text-align: center; color: #2c3e50; }
+        .section { margin-bottom: 2em; }
+        #stats { font-size: 1.1em; background: #f0f0f0; padding: 1em; border-radius: 8px; margin-bottom: 1em; }
+        label { display: block; margin-bottom: 0.5em; }
+        input[type="file"] { margin-bottom: 1em; }
+        button, input[type="submit"] {
+            background: #3498db; color: #fff; border: none; padding: 0.6em 1.2em; border-radius: 5px; cursor: pointer; font-size: 1em;
+        }
+        button:hover, input[type="submit"]:hover { background: #217dbb; }
+        .result { margin-top: 1em; color: #2c3e50; }
+        .test-buttons button { margin-right: 1em; margin-bottom: 0.5em; }
+        .config { background: #f9f9f9; padding: 1em; border-radius: 8px; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Go Web Server Dashboard</h1>
+
+    <div class="section">
+        <h2>Server Stats</h2>
+        <div id="stats">Loading...</div>
+    </div>
+
+    <div class="section">
+        <h2>File Upload</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="myfile">Select file to upload:</label>
+            <input type="file" id="myfile" name="myfile" required />
+            <input type="submit" value="Upload" />
+        </form>
+        <div class="result" id="uploadResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>Test Endpoints</h2>
+        <div class="test-buttons">
+            <button onclick="testEndpoint('/slow')">Test Slow Handler</button>
+            <button onclick="testEndpoint('/doesnotexist')">Test 404 Error</button>
+            <button onclick="testEndpoint('/healthz')">Test Health Check</button>
+        </div>
+        <div class="result" id="testResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>Current Configuration</h2>
+        <div class="config" id="configInfo">Loading...</div>
+    </div>
+</div>
+<script>
+// Fetch and display server stats
+function fetchStats() {
+    fetch('/stats')
+        .then(r => r.text())
+        .then(data => {
+            document.getElementById('stats').textContent = data;
+        })
+        .catch(() => {
+            document.getElementById('stats').textContent = 'Error fetching stats.';
+        });
+}
+setInterval(fetchStats, 1000);
+fetchStats();
+
+// Handle file upload
+const uploadForm = document.getElementById('uploadForm');
+uploadForm.onsubmit = function(e) {
+    e.preventDefault();
+    const formData = new FormData(uploadForm);
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.text())
+    .then(data => {
+        document.getElementById('uploadResult').textContent = data;
+        uploadForm.reset();
+    })
+    .catch(() => {
+        document.getElementById('uploadResult').textContent = 'Upload failed.';
+    });
+};
+
+// Test endpoints
+function testEndpoint(path) {
+    fetch(path)
+        .then(async r => {
+            let text = await r.text();
+            document.getElementById('testResult').textContent = `Status: ${r.status}\n${text}`;
+        })
+        .catch(() => {
+            document.getElementById('testResult').textContent = 'Request failed.';
+        });
+}
+
+// Show config info (simulate by fetching /stats and showing rate limit from page)
+function fetchConfig() {
+    fetch('/stats')
+        .then(r => r.text())
+        .then(data => {
+            let rateLimit = 'unknown';
+            const match = data.match(/Requests per minute per IP: (\d+)/);
+            if (match) rateLimit = match[1];
+            document.getElementById('configInfo').innerHTML =
+                `<b>HTTPS Port:</b> ${window.location.port || 8443}<br>` +
+                `<b>Rate Limit:</b> ${rateLimit} requests/minute/IP`;
+        })
+        .catch(() => {
+            document.getElementById('configInfo').textContent = 'Error fetching config.';
+        });
+}
+fetchConfig();
+</script>
+</body>
+</html> 

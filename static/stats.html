@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Stats Dashboard</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        #stats { font-size: 1.2em; background: #f0f0f0; padding: 1em; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Server Stats Dashboard</h1>
+    <div id="stats">Loading...</div>
+    <script>
+        function fetchStats() {
+            fetch('/stats')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('stats').textContent = data;
+                })
+                .catch(err => {
+                    document.getElementById('stats').textContent = 'Error fetching stats.';
+                });
+        }
+        setInterval(fetchStats, 1000);
+        fetchStats();
+    </script>
+</body>
+</html> 
