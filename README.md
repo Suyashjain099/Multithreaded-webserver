@@ -100,15 +100,6 @@ multithreaded-webserver/
 - **Graceful Shutdown:** Listens for OS signals and finishes in-progress requests before exiting.
 - **HTTPS:** All traffic is encrypted for security.
 
----
-
-## 📣 Demo Tips for Interviews
-
-- Open the dashboard and show real-time stats updating.
-- Upload a file and show it appears in the `uploads/` folder.
-- Trigger a 404 by visiting a non-existent page.
-- Show rate limiting by refreshing quickly or lowering the limit.
-- Explain how configuration and graceful shutdown work.
 
 ---
 
